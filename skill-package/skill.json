@@ -1,0 +1,42 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "en-IN": {
+          "name": "Meal Planner",
+          "summary": "Sample Short Description",
+          "description": "Sample Full Description",
+          "examplePhrases": [
+            "Alexa open meal planner",
+            "hello",
+            "help"
+          ],
+          "keywords": []
+        },
+        "hi-IN": {
+          "name": "meal-planner",
+          "summary": "Sample Short Description",
+          "description": "Sample Full Description",
+          "examplePhrases": [
+            "Alexa मज़ेदार नमस्ते दुनिया",
+            "hello",
+            "मदद करो"
+          ],
+          "keywords": []
+        }
+      },
+      "isAvailableWorldwide": true,
+      "testingInstructions": "Sample Testing Instructions.",
+      "category": "KNOWLEDGE_AND_TRIVIA",
+      "distributionCountries": []
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "uri": "arn:aws:lambda:us-east-1:583459595861:function:ask-meal-planner-default-default-1599293909339"
+        }
+      }
+    },
+    "manifestVersion": "1.0"
+  }
+}
