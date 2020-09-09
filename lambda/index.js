@@ -9,12 +9,14 @@ const https = require('https');
 const i18n = require('i18next');
 // i18n strings for all supported locales
 const languageStrings = require('./languageStrings');
+const config = require('./config.js');
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
     },
     handle(handlerInput) {
+        console.log("Triggering");
         const speakOutput = handlerInput.t('WELCOME_MSG');
 
         return handlerInput.responseBuilder
@@ -31,7 +33,7 @@ const SetMealIntentHandler = {
     },
     async handle(handlerInput) {
         const speakOutput = handlerInput.t('HELLO_MSG');
-        const output =  await httpGet(process.env.base,'maxRecords=100&view=Grid%20view');
+        const output =  await httpGet(config.airtable_base,'maxRecords=100&view=Grid%20view');
         var dishes = [];
         // cycle through dishes list
         for(record in output.records){
@@ -75,7 +77,7 @@ const SetMealIntentHandler = {
         }};
 
         updateMeal["records"].push(breakfast, lunch, dinner);
-        const update = await httpPost(process.env.base, 'Meal%20Plan', updateMeal);
+        const update = await httpPost(config.airtable_base, 'Meal%20Plan', updateMeal);
 
         return handlerInput.responseBuilder
             .speak(speakOutput)
@@ -83,6 +85,44 @@ const SetMealIntentHandler = {
             .getResponse();
     }
 };
+
+const SuggestDishIntentHandler = {
+    canHandle(handlerInput){
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+        && Alexa.getIntentName(handlerInput.requestEnvelope) === 'SuggestDishIntent'
+    },
+    async handle(handlerInput) {
+        // const mealType = handlerInput.requestEnvelope.request.intent.slots.mealType.resolutions.resolutionsPerAuthority[0].values[0];
+        const filledSlots = handlerInput.requestEnvelope.request.intent.slots; 
+        const slotValues = getSlotValues(filledSlots);
+        const mealType = slotValues.mealType.resolved;
+        const name = slotValues.name.resolved;
+        let speechOutput = "";
+
+        if(mealType && name){
+            // Search Airtable for Ideal For / Favorites
+
+            speechOutput = `Okay, so you want ${mealType} for ${name}. Got it!`;
+        } else if(name && !mealType){
+            // FAVOURITES = KARTHIK
+            let output = await httpGet(config.airtable_base,`maxRecords=20&view=Grid%20view&fields%5B%5D=Dishes&filterByFormula=(SEARCH("${name}",{Favourites}))`);
+            console.log(`${name}'s favorites`);
+            console.log(JSON.stringify(output));
+            speechOutput = `Okay, so you want something for ${name}. Got it!`;
+            // Search Airtable for Favorites 
+        } else {
+            speechOutput = `Okay, so you want something for ${mealType}. Got it!`;
+            // Search Airtable for Ideal For
+        }
+
+       
+        const speakOutput = speechOutput;
+        return handlerInput.responseBuilder
+            .speak(speakOutput)
+            .reprompt(speakOutput)
+            .getResponse();
+    }
+}
 
 const HelpIntentHandler = {
     canHandle(handlerInput) {
@@ -204,11 +244,11 @@ function httpGet(base, filter, table = "Dishes"){
         path: "/v0/" + base + "/" + table + "?" + filter,
         method: "GET",
         headers:{
-            Authorization: 'Bearer ' + process.env.apiKey
+            Authorization: 'Bearer ' + config.airtable_api_key
         }
     };
 
-    // console.log("FULL PATH = http://" + options.host + options.path);
+    console.log("FULL PATH = http://" + options.host + options.path);
     
     return new Promise(((resolve, reject) => {
       const request = https.request(options, (response) => {
@@ -246,7 +286,7 @@ function httpPost(base, table, data){
         path: "/v0/" + base + "/" + table,
         method: "POST",
         headers: {
-            'Authorization': 'Bearer ' + process.env.apiKey,
+            'Authorization': 'Bearer ' + config.airtable_api_key,
             'Content-Type': 'application/json',
             'Content-Length': output.length
         }
@@ -274,6 +314,49 @@ function httpPost(base, table, data){
         }));
 }
 
+/* Gets the Slot Values */
+function getSlotValues(filledSlots) {
+    const slotValues = {};
+  
+    console.log(`The filled slots: ${JSON.stringify(filledSlots)}`);
+    Object.keys(filledSlots).forEach((item) => {
+      const name = filledSlots[item].name;
+  
+      if (filledSlots[item] &&
+        filledSlots[item].resolutions &&
+        filledSlots[item].resolutions.resolutionsPerAuthority[0] &&
+        filledSlots[item].resolutions.resolutionsPerAuthority[0].status &&
+        filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
+        switch (filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
+          case 'ER_SUCCESS_MATCH':
+            slotValues[name] = {
+              synonym: filledSlots[item].value,
+              resolved: filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.name,
+              isValidated: true,
+            };
+            break;
+          case 'ER_SUCCESS_NO_MATCH':
+            slotValues[name] = {
+              synonym: filledSlots[item].value,
+              resolved: filledSlots[item].value,
+              isValidated: false,
+            };
+            break;
+          default:
+            break;
+        }
+      } else {
+        slotValues[name] = {
+          synonym: filledSlots[item].value,
+          resolved: filledSlots[item].value,
+          isValidated: false,
+        };
+      }
+    }, this);
+  
+    return slotValues;
+  }
+  
 
 // This request interceptor will bind a translation function 't' to the handlerInput
 const LocalisationRequestInterceptor = {
@@ -295,6 +378,7 @@ exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         LaunchRequestHandler,
         SetMealIntentHandler,
+        SuggestDishIntentHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,
         FallbackIntentHandler,
@@ -304,5 +388,5 @@ exports.handler = Alexa.SkillBuilders.custom()
         ErrorHandler)
     .addRequestInterceptors(
         LocalisationRequestInterceptor)
-    .withCustomUserAgent('sample/hello-world/v1.2')
+    .withCustomUserAgent('alexa-meal-planner')
     .lambda();

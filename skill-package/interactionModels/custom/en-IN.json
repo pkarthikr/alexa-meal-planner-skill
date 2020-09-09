@@ -1,7 +1,12 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "meal planner",
+            "invocationName": "meal helper",
+            "modelConfiguration": {
+                "fallbackIntentSensitivity": {
+                    "level": "LOW"
+                }
+            },
             "intents": [
                 {
                     "name": "AMAZON.CancelIntent",
@@ -32,9 +37,62 @@
                 {
                     "name": "AMAZON.FallbackIntent",
                     "samples": []
+                },
+                {
+                    "name": "SuggestDishIntent",
+                    "slots": [
+                        {
+                            "name": "name",
+                            "type": "AMAZON.FirstName"
+                        },
+                        {
+                            "name": "mealType",
+                            "type": "mealType"
+                        }
+                    ],
+                    "samples": [
+                        "{mealType} for {name}",
+                        "{mealType} that {name} likes",
+                        "{name} favorite for {mealType}",
+                        "what does {name} like for {mealType}",
+                        "what should I have for {mealType}",
+                        "{mealType} suggestion",
+                        "{mealType}",
+                        "give me a {mealType} recommendation",
+                        "{name} favourite",
+                        "give me {name} favourite"
+                    ]
                 }
             ],
-            "types": []
+            "types": [
+                {
+                    "name": "mealType",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "Dinner"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "Lunch",
+                                "synonyms": [
+                                    "brunch"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "Breakfast",
+                                "synonyms": [
+                                    "early morning",
+                                    "brunch"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
         }
     }
 }
