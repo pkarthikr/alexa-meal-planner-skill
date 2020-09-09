@@ -9,6 +9,7 @@ module.exports = {
     en: {
         translation: {
             WELCOME_MSG: 'Welcome to the meal planner.',
+            SUGGEST_MSG: 'You can ask me for suggestions',
             HELLO_MSG: 'You do not have a meal set yet. So I am going ahead and creating one for you. ',
             HELP_MSG: 'You can say hello to me! How can I help?',
             GOODBYE_MSG: 'Goodbye!',
