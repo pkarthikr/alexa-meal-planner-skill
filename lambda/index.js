@@ -7,6 +7,7 @@ const Alexa = require('ask-sdk-core');
 // i18n library dependency, we use it below in a localisation interceptor
 const https = require('https');
 const i18n = require('i18next');
+const moment = require('moment-timezone');
 // i18n strings for all supported locales
 const languageStrings = require('./languageStrings');
 const config = require('./config.js');
@@ -86,6 +87,42 @@ const SetMealIntentHandler = {
     }
 };
 
+const CookingDishIntentHandler = {
+    canHandle(handlerInput){
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+        && Alexa.getIntentName(handlerInput.requestEnvelope) === 'CookingDishIntent'
+    },
+    async handle(handlerInput){
+        // Logic for today's meal plan;
+        const {serviceClientFactory} = handlerInput;
+        const {deviceId} = handlerInput.requestEnvelope.context.System.devicels;
+        let userTimeZone;
+
+        try {
+            const upsServiceClient = serviceClientFactory.getUpsServiceClient();
+            userTimeZone = await upsServiceClient.getSystemTimeZone(deviceId);
+            try {
+                let day = moment.tz(userTimeZone).format('dddd');
+                console.log("Day is"+JSON.stringify(day));
+            } catch (error) {
+                console.log("another error");
+                console.log(error);
+            }
+           
+            console.log("We are in Time Zone");
+            console.log(userTimeZone);
+        } catch(err){
+            console.log("Some error catching up with Timezone");
+            console.log(err);
+            // May be define an alternate experience;
+        }
+        
+        dishes = await httpGet(config.airtable_base,`view=Grid%20view&fields%5B%5D=Meal%20Plan&fields%5B%5D=Monday`, 'Meal%20Plan');
+        console.log(JSON.stringify(dishes));
+        console.log("Printed The food");
+
+    }
+}
 const SuggestDishIntentHandler = {
     canHandle(handlerInput){
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
@@ -98,6 +135,7 @@ const SuggestDishIntentHandler = {
         const mealType = slotValues.mealType.resolved;
         const name = slotValues.name.resolved;
         let speechOutput = "";
+        let dishes;
 
         if(mealType && name){
             // Search Airtable for Ideal For / Favorites
@@ -105,23 +143,34 @@ const SuggestDishIntentHandler = {
             speechOutput = `Okay, so you want ${mealType} for ${name}. Got it!`;
         } else if(name && !mealType){
             // FAVOURITES = KARTHIK
-            let output = await httpGet(config.airtable_base,`maxRecords=20&view=Grid%20view&fields%5B%5D=Dishes&filterByFormula=(SEARCH("${name}",{Favourites}))`);
-            console.log(`${name}'s favorites`);
-            console.log(JSON.stringify(output));
-            speechOutput = `Okay, so you want something for ${name}. Got it!`;
+            dishes = await httpGet(config.airtable_base,`view=Grid%20view&fields%5B%5D=Dishes&filterByFormula%3D(SEARCH(%22${name}%22%2C%7BFavourites%7D))`);    
+            speechOutput += `So ${name} likes `;
             // Search Airtable for Favorites 
         } else {
-            speechOutput = `Okay, so you want something for ${mealType}. Got it!`;
+            dishes = await httpGet(config.airtable_base,`view=Grid%20view&fields%5B%5D=Dishes&filterByFormula%3D(SEARCH(%22${mealType}%22%2C%7BIdeal%20For%7D))`);
+            speechOutput += `Here is a ${mealType} suggestion `;
             // Search Airtable for Ideal For
         }
 
+        console.log(JSON.stringify(dishes.records));
+
+        let index = getRandomInt(dishes.records.length)
+        // console.log(dishes.length);
+        let dish = dishes.records[index];
+        console.log("HEre is your dish"+JSON.stringify(dish));
        
+        speechOutput += `${dish.fields.Dishes}. Hope you enjoy it!`;
+
         const speakOutput = speechOutput;
         return handlerInput.responseBuilder
             .speak(speakOutput)
             .reprompt(speakOutput)
             .getResponse();
     }
+}
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
 }
 
 const HelpIntentHandler = {
@@ -378,6 +427,7 @@ exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         LaunchRequestHandler,
         SetMealIntentHandler,
+        CookingDishIntentHandler,
         SuggestDishIntentHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,
@@ -388,5 +438,6 @@ exports.handler = Alexa.SkillBuilders.custom()
         ErrorHandler)
     .addRequestInterceptors(
         LocalisationRequestInterceptor)
+    .withApiClient(new Alexa.DefaultApiClient())
     .withCustomUserAgent('alexa-meal-planner')
     .lambda();
