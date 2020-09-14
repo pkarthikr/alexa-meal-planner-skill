@@ -39,6 +39,15 @@
                     "samples": []
                 },
                 {
+                    "name": "CookingDishIntent",
+                    "samples": [
+                        "what am I cooking today",
+                        "what is on my meal plan today",
+                        "meal planner for today",
+                        "meal plan for today"
+                    ]
+                },
+                {
                     "name": "SuggestDishIntent",
                     "slots": [
                         {
