@@ -94,32 +94,38 @@ const CookingDishIntentHandler = {
     },
     async handle(handlerInput){
         // Logic for today's meal plan;
+        console.log("Hello - we are here");
         const {serviceClientFactory} = handlerInput;
-        const {deviceId} = handlerInput.requestEnvelope.context.System.devicels;
-        let userTimeZone;
+        const {deviceId} = handlerInput.requestEnvelope.context.System.device;
+        let userTimeZone, day;
 
         try {
+
             const upsServiceClient = serviceClientFactory.getUpsServiceClient();
             userTimeZone = await upsServiceClient.getSystemTimeZone(deviceId);
+                 
+            console.log("We are in Time Zone");
+            console.log(userTimeZone);
+
             try {
-                let day = moment.tz(userTimeZone).format('dddd');
-                console.log("Day is"+JSON.stringify(day));
+                day = moment.tz(userTimeZone).format('dddd');
             } catch (error) {
                 console.log("another error");
                 console.log(error);
             }
-           
-            console.log("We are in Time Zone");
-            console.log(userTimeZone);
         } catch(err){
             console.log("Some error catching up with Timezone");
             console.log(err);
-            // May be define an alternate experience;
         }
         
-        dishes = await httpGet(config.airtable_base,`view=Grid%20view&fields%5B%5D=Meal%20Plan&fields%5B%5D=Monday`, 'Meal%20Plan');
+        dishes = await httpGet(config.airtable_base,`view=Grid%20view&fields%5B%5D=Meal%20Plan&fields%5B%5D=${day}`, 'Meal%20Plan');
         console.log(JSON.stringify(dishes));
-        console.log("Printed The food");
+        let speechOutput = dishes.records[0].fields[day];
+        let response = `For Breakfast today, you are having ${dishes.records[0].fields[day]}. For Lunch, you are eating ${dishes.records[1].fields[day]} and for dinner, you are going to have ${dishes.records[2].fields[day]}. Bon Appetit!`
+        console.log("Value of breakfast"+speechOutput);
+        return handlerInput.responseBuilder
+        .speak(response)
+        .getResponse();
 
     }
 }
