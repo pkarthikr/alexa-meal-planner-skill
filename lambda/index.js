@@ -16,9 +16,12 @@ const LaunchRequestHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
     },
-    handle(handlerInput) {
-        console.log("Triggering");
-        const speakOutput = handlerInput.t('WELCOME_MSG');
+    async handle(handlerInput) {
+        const {serviceClientFactory} = handlerInput;
+        const {deviceId} = handlerInput.requestEnvelope.context.System.device;
+
+        let meal =  await getCurrentMeal(serviceClientFactory, deviceId);
+        const speakOutput = handlerInput.t('WELCOME_MSG', {meal: meal});
 
         return handlerInput.responseBuilder
             .speak(speakOutput)
@@ -94,7 +97,6 @@ const CookingDishIntentHandler = {
     },
     async handle(handlerInput){
         // Logic for today's meal plan;
-        console.log("Hello - we are here");
         const {serviceClientFactory} = handlerInput;
         const {deviceId} = handlerInput.requestEnvelope.context.System.device;
         let userTimeZone, day;
@@ -411,7 +413,33 @@ function getSlotValues(filledSlots) {
   
     return slotValues;
   }
-  
+
+async function getCurrentMeal(serviceClientFactory, deviceId){
+    var currentMeal;
+    try {
+        const upsServiceClient = serviceClientFactory.getUpsServiceClient();
+        userTimeZone = await upsServiceClient.getSystemTimeZone(deviceId);
+        try {
+            let time = moment.tz(userTimeZone).format('HH');
+            let parseTime = parseInt(time);
+
+            if(parseTime >= 1 && parseTime <= 10){
+                currentMeal = 'breakfast';
+            } else if (parseTime > 10 && parseTime <= 15){
+                currentMeal = 'lunch'
+            } else {
+                currentMeal = 'dinner'
+            }
+            return currentMeal;
+        } catch (error) {
+            console.log("another error");
+            console.log(error);
+        }
+    } catch(err){
+        console.log("Some error catching up with Timezone");
+        console.log(err);
+    }
+}
 
 // This request interceptor will bind a translation function 't' to the handlerInput
 const LocalisationRequestInterceptor = {
