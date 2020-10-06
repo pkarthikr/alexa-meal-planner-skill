@@ -4,23 +4,56 @@
       "locales": {
         "en-IN": {
           "name": "Meal Planner",
-          "summary": "Sample Short Description",
-          "description": "Sample Full Description",
+          "summary": "Meal Planner helps you plan meals for your household.",
+          "description": "You can ask Meal Planner to set your meal, or just say what do I cook for dinner.",
           "examplePhrases": [
             "Alexa open meal planner",
-            "hello",
-            "help"
+            "what do I cook for dinner",
+            "give me a breakfast suggestion"
           ],
           "keywords": []
         },
-        "hi-IN": {
-          "name": "meal-planner",
-          "summary": "Sample Short Description",
-          "description": "Sample Full Description",
+        "en-US": {
+          "name": "Meal Planner",
+          "summary": "Meal Planner helps you plan meals for your household.",
+          "description": "You can ask Meal Planner to set your meal, or just say what do I cook for dinner.",
           "examplePhrases": [
-            "Alexa मज़ेदार नमस्ते दुनिया",
-            "hello",
-            "मदद करो"
+            "Alexa open meal planner",
+            "what do I cook for dinner",
+            "give me a breakfast suggestion"
+          ],
+          "keywords": []
+        },
+        "en-GB": {
+          "name": "Meal Planner",
+          "summary": "Meal Planner helps you plan meals for your household.",
+          "description": "You can ask Meal Planner to set your meal, or just say what do I cook for dinner.",
+          "examplePhrases": [
+            "Alexa open meal planner",
+            "what do I cook for dinner",
+            "give me a breakfast suggestion"
+          ],
+          "keywords": []
+        },
+        "en-AU": {
+          "name": "Meal Planner",
+          "summary": "Meal Planner helps you plan meals for your household.",
+          "description": "You can ask Meal Planner to set your meal, or just say what do I cook for dinner.",
+          "examplePhrases": [
+            "Alexa open meal planner",
+            "what do I cook for dinner",
+            "give me a breakfast suggestion"
+          ],
+          "keywords": []
+        },
+        "en-CA": {
+          "name": "Meal Planner",
+          "summary": "Meal Planner helps you plan meals for your household.",
+          "description": "You can ask Meal Planner to set your meal, or just say what do I cook for dinner.",
+          "examplePhrases": [
+            "Alexa open meal planner",
+            "what do I cook for dinner",
+            "give me a breakfast suggestion"
           ],
           "keywords": []
         }
