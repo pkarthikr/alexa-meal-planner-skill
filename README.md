@@ -24,7 +24,7 @@ For this skill to work, You will require
     *   Click on the __Create Skill__ Button.
 
 4. On the next page, click on the Import Skill Button and in the URL field, enter the URL of this repository. i.e [https://github.com/pkarthikr/alexa-meal-planner-skill.git](https://github.com/pkarthikr/alexa-meal-planner-skill.git) and click on Import. 
-![Import Skill](assets/import_skill.png)
+![Import Skill](assets/import_skill_image.png)
 
 5. Once the skill has been created, click on the Code Section at the top to access your Skill's Backend Logic. On this page, open the config.js file. 
 
