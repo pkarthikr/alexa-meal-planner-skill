@@ -8,6 +8,25 @@ For this skill to work, You will require
 
 ## Features
 
+Once you have setup the Skill, you can ask the skill the following things : 
+
+### Ask for a Suggestion 
+User : Alexa, ask meal planner for a breakfast / lunch / dinner suggestion. 
+Alexa : <Gives a suggestion for breakfast/lunch/dinner from your Airtable Dishes List>
+
+User : Alexa, ask meal planner for a breakfast that {name} likes. 
+Alexa : <Gives a suggestion from your Dishes table. The Name is picked up from the Favorites Column.>
+
+### Set your Weekly Plan and ask what you are cooking 
+User : Alexa, open meal planner
+Alexa : Welcome to Meal Planner. What would you like to do? 
+User : Set My Meal
+Alexa : <Sets your meal.>
+
+USer : Alexa, open meal planner
+Alexa : Welcome to Meal Planner. What would you like to do?
+User : What am I cooking today?
+Alexa : From your Meal Plan, you are cooking xx for breakfast, yy for lunch and zz for Dinner. 
 
 
 ## Installation 
