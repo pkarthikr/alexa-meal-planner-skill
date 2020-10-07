@@ -1,3 +1,36 @@
+## Meal Planner 
+
+This Alexa Skill Template allows you to plan your meals and ask for suggestions on what to cook. 
+For this skill to work, You will require 
+1. [An Amazon Developer Account](https://developer.amazon.com/)
+2. [An Airtable Account](https://airtable.com/invite/r/henbCQON)
+3. [An Airtable Base that looks like this](https://airtable.com/shrVv5h43q73fgPzl)
+
+## Installation 
+
+1. Once you have registered for an Amazon Developer Account, head over to the [Alexa Developer Console](https://developer.amazon.com/alexa/console/ask).
+
+2. Click on Create Skill Button
+
+3. On the page that comes up,
+    *   Enter __Meal Planner__ as the Skill Name. 
+    *   Choose the Default Language. Only __English__ is supported for now. 
+    *   In the Choose a model to add to your skill section, Choose __Custom__
+    *   In the Choose a method to host your skill's backend resources, Choose __Alexa-Hosted (Node.js)__
+    *   Click on the __Create Skill__ Button.
+
+4. On the next page, click on the Import Skill Button and in the URL field, enter the URL of this repository. i.e [https://github.com/pkarthikr/alexa-meal-planner-skill.git](https://github.com/pkarthikr/alexa-meal-planner-skill.git) and click on Import. 
+![Import Skill](assets/import_skill.png)
+
+5. Once the skill has been created, click on the Code Section at the top to access your Skill's Backend Logic. On this page, open the config.js file. 
+
+6. You will need your [Airtable API Key](https://airtable.com/account) and the Base ID.
+
+7. To get the Base ID, open your Airtable Base and click on Help in the Top Right Corner and click on API Documentation. Get the ID from the Documentation page. 
+![Airtable ID](assets/Airtable_Base_ID.png)
+
+8. Populate Dishes in the Dishes tab of your Airtable Base. Alexa's Meal Planner will help you suggest a random dish whenever you say "Alexa, ask meal planner for a "dinner" suggestion".
+
 ToDo : 
 
 1. Determine if the user has set the plan for the week, and if not tell them about setting a meal plan. 
