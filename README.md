@@ -6,6 +6,10 @@ For this skill to work, You will require
 2. [An Airtable Account](https://airtable.com/invite/r/henbCQON)
 3. [An Airtable Base that looks like this](https://airtable.com/shrVv5h43q73fgPzl)
 
+## Features
+
+
+
 ## Installation 
 
 1. Once you have registered for an Amazon Developer Account, head over to the [Alexa Developer Console](https://developer.amazon.com/alexa/console/ask).
