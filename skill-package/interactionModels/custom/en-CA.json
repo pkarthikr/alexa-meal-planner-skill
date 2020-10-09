@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "meal planner",
+            "invocationName": "meal bot",
             "modelConfiguration": {
                 "fallbackIntentSensitivity": {
                     "level": "LOW"
@@ -40,7 +40,16 @@
                 },
                 {
                     "name": "CookingDishIntent",
+                    "slots": [
+                        {
+                            "name": "mealType",
+                            "type": "mealType"
+                        }
+                    ],
                     "samples": [
+                        "{mealType} plan for today",
+                        "what's the plan for {mealType}",
+                        "what am I cooking today for {mealType}",
                         "what am I cooking today",
                         "what is on my meal plan today",
                         "meal planner for today",

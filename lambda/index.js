@@ -11,6 +11,7 @@ const moment = require('moment-timezone');
 // i18n strings for all supported locales
 const languageStrings = require('./languageStrings');
 const config = require('./config.js');
+const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
@@ -99,32 +100,50 @@ const CookingDishIntentHandler = {
         // Logic for today's meal plan;
         const {serviceClientFactory} = handlerInput;
         const {deviceId} = handlerInput.requestEnvelope.context.System.device;
-        let userTimeZone, day;
-
+        let userTimeZone, day, response;
+        const filledSlots = handlerInput.requestEnvelope.request.intent.slots
+        let slotValues = getSlotValues(filledSlots);
+        const mealType = slotValues.mealType.resolved;
+        
         try {
-
             const upsServiceClient = serviceClientFactory.getUpsServiceClient();
-            userTimeZone = await upsServiceClient.getSystemTimeZone(deviceId);
-                 
-            console.log("We are in Time Zone");
-            console.log(userTimeZone);
+                userTimeZone = await upsServiceClient.getSystemTimeZone(deviceId);
+                    
+                console.log("We are in Time Zone");
+                console.log(userTimeZone);
 
-            try {
-                day = moment.tz(userTimeZone).format('dddd');
-            } catch (error) {
-                console.log("another error");
-                console.log(error);
-            }
+                try {
+                    day = moment.tz(userTimeZone).format('dddd');
+                } catch (error) {
+                    console.log("another error");
+                    console.log(error);
+                }
         } catch(err){
             console.log("Some error catching up with Timezone");
             console.log(err);
         }
-        
+
         dishes = await httpGet(config.airtable_base,`view=Grid%20view&fields%5B%5D=Meal%20Plan&fields%5B%5D=${day}`, 'Meal%20Plan');
-        console.log(JSON.stringify(dishes));
-        let speechOutput = dishes.records[0].fields[day];
-        let response = `For Breakfast today, you are having ${dishes.records[0].fields[day]}. For Lunch, you are eating ${dishes.records[1].fields[day]} and for dinner, you are going to have ${dishes.records[2].fields[day]}. Bon Appetit!`
-        console.log("Value of breakfast"+speechOutput);
+        
+        if(mealType){
+            var mealIndex; 
+            switch(mealType){
+                case 'Breakfast':
+                    mealIndex = 0;
+                    break;
+                case 'Lunch':
+                    mealIndex = 1;
+                    break;
+                case 'Dinner':
+                    mealIndex = 2;
+                    break;
+            }
+            response = `For ${mealType} today, you are having ${dishes.records[mealIndex].fields[day]}. Bon Appetit!`
+        } else {
+            response = `For Breakfast today, you are having ${dishes.records[0].fields[day]}. For Lunch, you are eating ${dishes.records[1].fields[day]} and for dinner, you are going to have ${dishes.records[2].fields[day]}. Bon Appetit!`
+        }
+       
+
         return handlerInput.responseBuilder
         .speak(response)
         .getResponse();
