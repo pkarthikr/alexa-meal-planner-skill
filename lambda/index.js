@@ -150,6 +150,49 @@ const CookingDishIntentHandler = {
 
     }
 }
+
+const getFirstResolvedEntityValue = (element) => {
+    const [firstResolution = {}] = element.resolutions.resolutionsPerAuthority || [];
+    return firstResolution && firstResolution.status.code === 'ER_SUCCESS_MATCH'
+        ? firstResolution.values[0].value.id
+        : null;
+};
+
+const getReadableSlotValue = (handlerInput, slotName) => {
+    const rootSlotValue = Alexa.getSlotValueV2(handlerInput.requestEnvelope, slotName);
+    const slotValueStr = !rootSlotValue
+        ? 'None'
+        : Alexa.getSimpleSlotValues(rootSlotValue)
+              .map(
+                  (slotValue) =>
+                      getFirstResolvedEntityValue(slotValue) || `${slotValue.value}`
+              )
+              .join(' ');
+    return `${slotName} ${slotValueStr}`;
+};
+
+
+
+const FindDishIntentHandler = {
+    canHandle(handlerInput){
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+        && Alexa.getIntentName(handlerInput.requestEnvelope) === 'FindDishIntent'
+    },
+    async handle(handlerInput) {
+        // const filledSlots = handlerInput.requestEnvelope.request.intent.slots
+        // let slotValues = getSlotValues(filledSlots);
+        // console.log(JSON.stringify(slotValues));
+        const ingredientsResponse = getReadableSlotValue(handlerInput, 'ingredients');
+        console.log(ingredientsResponse);
+
+        const speakOutput = "You are in FindDishIntent Handler";
+
+        return handlerInput.responseBuilder
+            .speak(speakOutput)
+            .reprompt(speakOutput)
+            .getResponse();
+    }
+}
 const SuggestDishIntentHandler = {
     canHandle(handlerInput){
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
@@ -480,6 +523,7 @@ exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         LaunchRequestHandler,
         SetMealIntentHandler,
+        FindDishIntentHandler,
         CookingDishIntentHandler,
         SuggestDishIntentHandler,
         HelpIntentHandler,

@@ -80,6 +80,25 @@
                         "{name} favourite",
                         "give me {name} favourite"
                     ]
+                },
+                {
+                    "name": "FindDishIntent",
+                    "slots": [
+                        {
+                            "name": "ingredients",
+                            "type": "ingredientType",
+                            "multipleValues": {
+                                "enabled": true
+                            }
+                        }
+                    ],
+                    "samples": [
+                        "with {ingredients} what can i do",
+                        "recipes with {ingredients}",
+                        "{ingredients}",
+                        "i have {ingredients}",
+                        "what can I cook with {ingredients}"
+                    ]
                 }
             ],
             "types": [
@@ -106,6 +125,59 @@
                                     "early morning",
                                     "brunch"
                                 ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "ingredientType",
+                    "values": [
+                        {
+                            "id": "OLIVE_OIL",
+                            "name": {
+                                "value": "olive oil"
+                            }
+                        },
+                        {
+                            "id": "PEAS",
+                            "name": {
+                                "value": "peas"
+                            }
+                        },
+                        {
+                            "id": "CUCUMBER",
+                            "name": {
+                                "value": "cucumbers"
+                            }
+                        },
+                        {
+                            "id": "POTATO",
+                            "name": {
+                                "value": "potatoes"
+                            }
+                        },
+                        {
+                            "id": "TOMATO",
+                            "name": {
+                                "value": "tomatoes"
+                            }
+                        },
+                        {
+                            "id": "ONION",
+                            "name": {
+                                "value": "onions"
+                            }
+                        },
+                        {
+                            "id": "GARLIC",
+                            "name": {
+                                "value": "garlic"
+                            }
+                        },
+                        {
+                            "id": "MUSHROOM",
+                            "name": {
+                                "value": "mushrooms"
                             }
                         }
                     ]
